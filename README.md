@@ -5,7 +5,7 @@ podcast_downloader provides a set of classes for creating a podcast.
 Install dependencies
 
 ```
-apt install git python3 python3-setuptools python3-pip python-wheel-common
+apt install git python3 python3-setuptools python3-pip python-wheel-common ffmpeg
 ```
 
 Clone the repo, enter the directory
