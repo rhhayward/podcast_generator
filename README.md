@@ -23,5 +23,6 @@ python3 setup.py sdist bdist_wheel
 Install
 
 ```
-python3 -m pip install dist/*.whl
+cd ..
+python3 -m pip install podcast_generator/dist/*.whl
 ```
