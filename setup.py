@@ -4,7 +4,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="podcast_generator-rhhayward",
+    name="podcast_generator",
     version="0.0.1",
     author="Ryan Hayward",
     author_email="rhhayward@att.net",
