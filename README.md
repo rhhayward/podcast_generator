@@ -26,3 +26,43 @@ Install
 cd ..
 python3 -m pip install podcast_generator/dist/*.whl
 ```
+
+
+### Example
+
+```
+#!/usr/bin/env python3
+
+from podcast_generator import *
+
+### Specify database to use.  A new one
+###    will be created if it does not exist.
+db = PodcastDb("./podcastdb.sqlite")
+
+### PodcastCreator collects downloaders,
+###    sets up the location for the files
+###    to be downloaded to, 
+podcast = PodcastCreator()
+podcast.useDb(db)
+podcast.setDestFolder("/opt/")
+podcast.setMaxCount(1)
+podcast.setOutputXmlFile("/opt/rss.xml")
+podcast.setTitle("example-podcast")
+podcast.setLink("http://exampledomain/rss.xml")
+podcast.setEnclosureBaseUrl("http://exampledomain/")
+
+### Create a downloader
+downloader = UrlDownloader("https://ia903204.us.archive.org/31/items/merriemelodies_pubdom/")
+downloader.addExtension("mp4")
+podcast.addDownloader(downloader)
+
+### Execute the download
+podcast.getFiles()
+
+### Delete files older than...
+podcast.cleanupFiles(3)
+
+### Having downloaded the files,
+###   write the rss
+podcast.writeOutputFile()
+```
