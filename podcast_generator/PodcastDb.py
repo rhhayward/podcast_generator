@@ -14,8 +14,9 @@ class PodcastDb:
         conn = sqlite3.connect(databaseFile)
         self.c = conn.cursor()
         self.db = conn
-        self.c.execute(''' CREATE TABLE IF NOT EXISTS downloaded_urls (url text)''')
-        self.c.execute(''' CREATE TABLE IF NOT EXISTS available_files (filename text, pubDate text, dlDate DATETIME)''')
+        self.c.execute('''CREATE TABLE IF NOT EXISTS downloaded_urls (url text)''')
+        self.c.execute('''CREATE TABLE IF NOT EXISTS available_files (filename text, pubDate text, dlDate DATETIME)''')
+        self.c.execute('''CREATE TABLE IF NOT EXISTS additional_fields (filename text, fieldName, fieldValue)''')
 
     ### insertPodcast stores podcast to database
     ###   for the rss file downloads
@@ -24,6 +25,10 @@ class PodcastDb:
             date = datetime.datetime.now().strftime("%a, %d %b %Y %H:%M:%S %z")
         self.c.execute( "INSERT INTO available_files VALUES (?,?,datetime('now'))", \
             (basename(podcast.getFileName()),date,) )
+        for field in podcast.getAdditionalFields():
+            self.c.execute( "INSERT INTO additional_fields VALUES (?,?,?)", \
+            (basename(podcast.getFileName()), field['fieldName'], field['fieldValue'],) )
+
         self.db.commit()
 
     ### addDownloadedUrl marks a url as
@@ -50,7 +55,12 @@ class PodcastDb:
         dbFiles = self.c.fetchall()
         podcasts = []
         for [dbFile, pubDate] in dbFiles:
-            podcasts.append(Podcast(fileName=dbFile, date=pubDate))
+            self.c.execute(" SELECT fieldName, fieldValue FROM additional_fields WHERE filename=?", (dbFile,))
+            dbFields = self.c.fetchall()
+            fields = []
+            for [fieldName, fieldValue] in dbFields:
+                fields.append({"fieldName": fieldName, "fieldValue": fieldValue})
+            podcasts.append(Podcast(fileName=dbFile, date=pubDate, additionalFields=fields))
         return podcasts
 
     ### cleanupFiles takes a number of days before
@@ -75,6 +85,8 @@ class PodcastDb:
             files.append(dbFile)
 
         o = self.c.execute(" DELETE FROM available_files WHERE dlDate <= date('now',?) ", (count,))
+        for [dbFile] in dbFiles:
+            o = self.c.execute(" DELETE FROM additional_fields WHERE filename=?", (dbFile,))
         self.db.commit()
 
         return files

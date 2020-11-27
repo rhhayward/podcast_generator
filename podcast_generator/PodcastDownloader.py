@@ -100,7 +100,7 @@ class PodcastDownloader:
     ###   that function can do it, and
     ###   then moves it to the destFolder,
     ###   if it exists.
-    def makeFileToPodcast(self, filename):
+    def makeFileToPodcast(self, filename, additionalFields=[]):
         convertReturn = self.convertToM4v(filename)
 
         if(convertReturn):
@@ -108,7 +108,7 @@ class PodcastDownloader:
         else:
             convertedFilename=filename
 
-        p = Podcast(fileName=convertedFilename)
+        p = Podcast(fileName=convertedFilename, additionalFields=additionalFields)
         self.db.insertPodcast(p)
 
         if not self.destFolder is None:

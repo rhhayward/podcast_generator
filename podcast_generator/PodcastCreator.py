@@ -110,10 +110,19 @@ class PodcastCreator:
             file = podcast.getFileName()
             pubDate = podcast.getDate()
             item = etree.SubElement(channel, "item")
-            etree.SubElement(item, "title").text = file
             etree.SubElement(item, "enclosure").set("url", self.enclosureBaseUrl + urllib.quote(file))
             etree.SubElement(item, "category").text = "Podcasts"
             etree.SubElement(item, "pubDate").text = pubDate
+            etree.SubElement(item, "guid").text = self.enclosureBaseUrl + urllib.quote(file)
+
+            titleAdded = False
+            for field in podcast.getAdditionalFields():
+                if field['fieldName'] == "title":
+                    titleAdded = True
+                etree.SubElement(item, field['fieldName']).text = field['fieldValue']
+
+            if titleAdded == False:
+                etree.SubElement(item, "title").text = file
 
         fh.write(etree.tostring(channel, encoding='UTF-8', xml_declaration=True, pretty_print=True))
         fh.close()

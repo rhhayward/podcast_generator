@@ -52,7 +52,7 @@ podcast.setLink("http://exampledomain/rss.xml")
 podcast.setEnclosureBaseUrl("http://exampledomain/")
 
 ### Create a downloader
-downloader = UrlDownloader("https://ia903204.us.archive.org/31/items/merriemelodies_pubdom/")
+downloader = UrlDownloader("https://ia801301.us.archive.org/32/items/VideoTestFiles/")
 downloader.addExtension("mp4")
 podcast.addDownloader(downloader)
 
