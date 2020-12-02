@@ -99,7 +99,8 @@ class PodcastCreator:
         self.podcasts = self.db.getPodcastsFromDb()
         fh = open(self.outputFile, "wb")
 
-        channel = etree.Element("channel")
+        rss = etree.Element("rss")
+        channel = etree.SubElement(rss, "channel")
         etree.SubElement(channel, "title").text = self.title
         etree.SubElement(channel, "description").text = self.title
         etree.SubElement(channel, "link").text = self.link
@@ -124,7 +125,7 @@ class PodcastCreator:
             if titleAdded == False:
                 etree.SubElement(item, "title").text = file
 
-        fh.write(etree.tostring(channel, encoding='UTF-8', xml_declaration=True, pretty_print=True))
+        fh.write(etree.tostring(rss, encoding='UTF-8', xml_declaration=True, pretty_print=True))
         fh.close()
 
     ### cleanupFiles takes a number of days before
