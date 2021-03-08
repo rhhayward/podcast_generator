@@ -39,6 +39,7 @@ class PodcastDownloader:
         value = re.sub('[^\w\s-]', '', str(value)).strip().lower()
         value = re.sub('[-\s]+', '-', value)
         value = re.sub('^-+', '', value)
+        value = re.sub('^b','', value)
         return value
 
 
