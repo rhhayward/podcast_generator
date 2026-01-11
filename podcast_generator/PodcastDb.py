@@ -4,29 +4,32 @@ from os.path import basename
 from .Podcast import *
 
 ### PodcastDb is the class that
-###   remembers urls downloaded
-###   and files that are available
-###   for the rss.
+###   records urls downloaded
+###   and files that are currently
+###   available for the rss.
 class PodcastDb:
-    ### connect to the database and create
-    ###   the tables, unless they already exist.
+    ### connect to the database, creating
+    ###   the tables if necessary.
     def __init__(self, databaseFile):
         conn = sqlite3.connect(databaseFile)
         self.c = conn.cursor()
         self.db = conn
-        self.c.execute('''CREATE TABLE IF NOT EXISTS downloaded_urls (url text)''')
-        self.c.execute('''CREATE TABLE IF NOT EXISTS available_files (filename text, pubDate text, dlDate DATETIME)''')
-        self.c.execute('''CREATE TABLE IF NOT EXISTS additional_fields (filename text, fieldName, fieldValue)''')
+        self.c.execute('''CREATE TABLE IF NOT EXISTS downloaded_urls
+                       (id INTEGER PRIMARY KEY AUTOINCREMENT, url text, dlDate DATETIME)''')
+        self.c.execute('''CREATE TABLE IF NOT EXISTS available_files
+                       (id INTEGER PRIMARY KEY AUTOINCREMENT, filename text, pubDate text, dlDate DATETIME)''')
+        self.c.execute('''CREATE TABLE IF NOT EXISTS additional_fields
+                       (id INTEGER PRIMARY KEY AUTOINCREMENT, filename text, fieldName, fieldValue)''')
 
     ### insertPodcast stores podcast to database
     ###   for the rss file downloads
     def insertPodcast(self, podcast, date=None):
         if date is None:
             date = datetime.datetime.now().strftime("%a, %d %b %Y %H:%M:%S %z")
-        self.c.execute( "INSERT INTO available_files VALUES (?,?,datetime('now'))", \
+        self.c.execute( "INSERT INTO available_files (filename, pubDate, dlDate) VALUES (?,?,datetime('now'))", \
             (basename(podcast.getFileName()),date,) )
         for field in podcast.getAdditionalFields():
-            self.c.execute( "INSERT INTO additional_fields VALUES (?,?,?)", \
+            self.c.execute( "INSERT INTO additional_fields (filename, fieldName, fieldValue) VALUES (?,?,?)", \
             (basename(podcast.getFileName()), field['fieldName'], field['fieldValue'],) )
 
         self.db.commit()
@@ -35,7 +38,7 @@ class PodcastDb:
     ###   having been processed, and doesn't
     ###   need to be processed again.
     def addDownloadedUrl(self,url):
-        self.c.execute( "INSERT INTO downloaded_urls VALUES (?)", (url,))
+        self.c.execute( "INSERT INTO downloaded_urls (url) VALUES (?)", (url,))
         self.db.commit()
 
     ### alreadyDownloadedUrl checks database
